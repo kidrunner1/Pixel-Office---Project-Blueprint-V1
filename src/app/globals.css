@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  background: #020617;
+}
+
+.pixel-art-image {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.public-office-floor {
+  background-color: #b98e63;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0,
+      transparent 31px,
+      rgba(83, 54, 38, 0.13) 32px,
+      rgba(83, 54, 38, 0.13) 33px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 63px,
+      rgba(255, 243, 216, 0.08) 64px,
+      rgba(255, 243, 216, 0.08) 65px
+    );
+  box-shadow:
+    inset 0 18px 24px rgba(18, 29, 43, 0.22),
+    inset 0 -32px 54px rgba(71, 42, 30, 0.18);
+}
+
+.public-office-object {
+  filter: drop-shadow(0 6px 4px rgba(2, 6, 23, 0.4));
+}
+
+.text-shadow-public {
+  text-shadow: 0 3px 0 rgba(2, 6, 23, 0.7);
+}
+
+.public-scene-person {
+  animation: public-scene-idle 2.8s steps(2, end) infinite;
+}
+
+@keyframes public-scene-idle {
+  0%,
+  88%,
+  100% {
+    transform: translateY(0);
+  }
+
+  94% {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes office-player-walk {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+.office-player-walking {
+  animation: office-player-walk 160ms steps(2, end) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .office-player-walking,
+  .public-scene-person {
+    animation: none;
+  }
+}

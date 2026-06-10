@@ -7,16 +7,23 @@ import {
   SERVER_SOCKET_EVENTS,
 } from "./socket-events.ts";
 import { createSocketRoomState } from "./socket-room-state.ts";
+import {
+  getSocketAllowedOrigin,
+  getSocketPort,
+  handleSocketHealthRequest,
+} from "./socket-runtime.ts";
 import type {
   ClientToServerEvents,
   ServerToClientEvents,
 } from "./socket-types.ts";
 
-const socketPort = Number(process.env.SOCKET_PORT ?? 4000);
-const clientOrigin = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+const port = getSocketPort();
+const clientOrigin = getSocketAllowedOrigin();
 const isDevelopment = process.env.NODE_ENV !== "production";
 
-const httpServer = createServer();
+const httpServer = createServer((request, response) => {
+  handleSocketHealthRequest(request, response);
+});
 const roomState = createSocketRoomState();
 
 const io = new Server<ClientToServerEvents, ServerToClientEvents>(httpServer, {
@@ -120,6 +127,6 @@ io.on("connection", (socket) => {
   });
 });
 
-httpServer.listen(socketPort, () => {
-  console.log(`Socket server running on http://localhost:${socketPort}`);
+httpServer.listen(port, () => {
+  console.log(`Socket server running on http://localhost:${port}`);
 });

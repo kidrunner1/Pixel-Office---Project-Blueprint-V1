@@ -10,6 +10,7 @@ export const roomMemberStatusOptions = [
   "focus",
   "meeting",
   "break",
+  "away",
 ] as const;
 
 export const roomMemberStatusSchema = z.enum(roomMemberStatusOptions);

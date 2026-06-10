@@ -4,6 +4,11 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 
 import { useTranslation } from "@/features/i18n/use-translation";
+import {
+  getStatusPresentation,
+  type StatusTone,
+} from "@/features/office/utils/status-label";
+import { syncSocketPresence } from "@/features/office/utils/sync-socket-presence";
 import { roomMemberStatusOptions } from "@/lib/validations/room";
 import { useRoomStore } from "@/stores/room-store";
 import type { RoomMemberStatus, RoomMemberView } from "@/types/room";
@@ -11,25 +16,43 @@ import type { RoomMemberStatus, RoomMemberView } from "@/types/room";
 type OfficeStatusPanelProps = {
   compact?: boolean;
   currentUserId: string;
+  currentUserName: string;
   member: RoomMemberView;
+  onManualStatusChange: (status: RoomMemberStatus) => void;
 };
 
-function isRoomMemberStatus(value: string): value is RoomMemberStatus {
-  return roomMemberStatusOptions.some((status) => status === value);
-}
+const selectedStatusClasses: Record<StatusTone, string> = {
+  active: "border-emerald-300 bg-emerald-400/15 text-emerald-100",
+  focus: "border-cyan-300 bg-cyan-400/15 text-cyan-100",
+  meeting: "border-violet-300 bg-violet-400/15 text-violet-100",
+  break: "border-amber-300 bg-amber-400/15 text-amber-100",
+  away: "border-slate-400 bg-slate-700/70 text-slate-100",
+};
 
 export function OfficeStatusPanel({
   compact = false,
   currentUserId,
+  currentUserName,
   member,
+  onManualStatusChange,
 }: OfficeStatusPanelProps) {
   const { t } = useTranslation();
   const updateMyMember = useRoomStore((state) => state.updateMyMember);
   const isLoading = useRoomStore((state) => state.isLoading);
-  const [status, setStatus] = useState<RoomMemberStatus>(member.status);
+  const [statusDraft, setStatusDraft] = useState<{
+    sourceStatus: RoomMemberStatus;
+    value: RoomMemberStatus;
+  }>({
+    sourceStatus: member.status,
+    value: member.status,
+  });
   const [todayTask, setTodayTask] = useState(member.todayTask ?? "");
   const [message, setMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const status =
+    statusDraft.value !== statusDraft.sourceStatus
+      ? statusDraft.value
+      : member.status;
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -42,6 +65,17 @@ export function OfficeStatusPanel({
         positionY: member.positionY,
         status,
         todayTask,
+      });
+      const savedMember = useRoomStore.getState().myMember;
+
+      if (savedMember) {
+        syncSocketPresence(currentUserName, savedMember);
+      }
+
+      onManualStatusChange(status);
+      setStatusDraft({
+        sourceStatus: status,
+        value: status,
       });
       setMessage(t("office.statusSaved"));
     } catch {
@@ -70,28 +104,48 @@ export function OfficeStatusPanel({
         className={compact ? "mt-3 space-y-3" : "mt-4 space-y-4"}
         onSubmit={handleSubmit}
       >
-        <label className="space-y-2" htmlFor="room-status">
-          <span className="block text-sm font-medium text-emerald-200">
+        <fieldset disabled={isLoading}>
+          <legend className="text-sm font-medium text-emerald-200">
             {t("office.status")}
-          </span>
-          <select
-            className="w-full rounded border-2 border-emerald-900 bg-slate-950 px-3 py-2 text-sm text-slate-100 outline-none transition focus:border-emerald-300 focus:ring-2 focus:ring-emerald-400/20"
-            disabled={isLoading}
-            id="room-status"
-            onChange={(event) => {
-              if (isRoomMemberStatus(event.target.value)) {
-                setStatus(event.target.value);
-              }
-            }}
-            value={status}
-          >
-            {roomMemberStatusOptions.map((option) => (
-              <option key={option} value={option}>
-                {t(`status.${option}`)}
-              </option>
-            ))}
-          </select>
-        </label>
+          </legend>
+          <div className="mt-2 grid grid-cols-2 gap-1.5">
+            {roomMemberStatusOptions.map((option) => {
+              const presentation = getStatusPresentation(option);
+              const isSelected = option === status;
+
+              return (
+                <button
+                  aria-pressed={isSelected}
+                  className={[
+                    "flex min-h-10 items-center gap-2 border px-2.5 py-2 text-left text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-emerald-300 disabled:cursor-not-allowed disabled:opacity-60",
+                    option === "away" ? "col-span-2" : "",
+                    isSelected
+                      ? selectedStatusClasses[presentation.tone]
+                      : "border-slate-700 bg-slate-950/70 text-slate-400 hover:border-slate-500 hover:text-slate-200",
+                  ].join(" ")}
+                  key={option}
+                  onClick={() =>
+                    setStatusDraft({
+                      sourceStatus: member.status,
+                      value: option,
+                    })
+                  }
+                  type="button"
+                >
+                  <span aria-hidden="true" className="text-sm">
+                    {presentation.icon}
+                  </span>
+                  <span className="truncate">
+                    {t(presentation.labelKey)}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-2 text-[10px] leading-4 text-slate-500">
+            {t("office.autoAwayHint")}
+          </p>
+        </fieldset>
 
         <label className="space-y-2" htmlFor="today-task">
           <span className="block text-sm font-medium text-emerald-200">

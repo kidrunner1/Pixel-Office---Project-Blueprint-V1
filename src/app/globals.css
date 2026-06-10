@@ -71,13 +71,94 @@ body {
   }
 }
 
+@keyframes office-player-step-left {
+  0%,
+  100% {
+    transform: translateY(-2px);
+  }
+
+  50% {
+    transform: translateY(1px);
+  }
+}
+
+@keyframes office-player-step-right {
+  0%,
+  100% {
+    transform: translateY(1px);
+  }
+
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes office-speech-bubble-lifecycle {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.96);
+  }
+
+  7% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  84% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-5px) scale(0.98);
+  }
+}
+
+@keyframes office-speech-bubble-fade {
+  0% {
+    opacity: 0;
+  }
+
+  5%,
+  88% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
 .office-player-walking {
   animation: office-player-walk 160ms steps(2, end) infinite;
 }
 
+.office-player-walking .avatar-leg-left {
+  animation: office-player-step-left 160ms steps(2, end) infinite;
+}
+
+.office-player-walking .avatar-leg-right {
+  animation: office-player-step-right 160ms steps(2, end) infinite;
+}
+
+.office-speech-bubble {
+  animation: office-speech-bubble-lifecycle 4000ms linear both;
+  transform-origin: bottom center;
+  will-change: opacity, transform;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .office-player-walking .avatar-leg-left,
+  .office-player-walking .avatar-leg-right,
   .office-player-walking,
   .public-scene-person {
     animation: none;
+  }
+
+  .office-speech-bubble {
+    animation: office-speech-bubble-fade 4000ms linear both;
+    transform: none;
+    will-change: opacity;
   }
 }

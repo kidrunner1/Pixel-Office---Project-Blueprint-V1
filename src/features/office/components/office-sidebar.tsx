@@ -6,6 +6,8 @@ import { AvatarCustomizer } from "@/features/avatar/components/avatar-customizer
 import { useTranslation } from "@/features/i18n/use-translation";
 import { OfficeMemberList } from "@/features/office/components/office-member-list";
 import { OfficeStatusPanel } from "@/features/office/components/office-status-panel";
+import { getStatusPresentation } from "@/features/office/utils/status-label";
+import type { RoomMemberStatus } from "@/types/room";
 import type { RoomMemberView } from "@/types/room";
 
 type OfficeSidebarProps = {
@@ -17,6 +19,7 @@ type OfficeSidebarProps = {
   members: RoomMemberView[];
   myMember: RoomMemberView | null;
   onClose: () => void;
+  onManualStatusChange: (status: RoomMemberStatus) => void;
 };
 
 type SidebarTab = "profile" | "today" | "members" | "customize";
@@ -75,6 +78,7 @@ export function OfficeSidebar({
   members,
   myMember,
   onClose,
+  onManualStatusChange,
 }: OfficeSidebarProps) {
   const [activeTab, setActiveTab] = useState<SidebarTab>("profile");
   const { t } = useTranslation();
@@ -84,12 +88,9 @@ export function OfficeSidebar({
     members: t("office.members"),
     customize: t("office.avatar"),
   };
-  const statusLabels: Record<RoomMemberView["status"], string> = {
-    online: t("status.online"),
-    focus: t("status.focus"),
-    meeting: t("status.meeting"),
-    break: t("status.break"),
-  };
+  const statusPresentation = myMember
+    ? getStatusPresentation(myMember.status)
+    : null;
   const displayRole =
     currentUserRole.toUpperCase() === "MEMBER"
       ? t("role.member")
@@ -179,7 +180,7 @@ export function OfficeSidebar({
                     </dt>
                     <dd className="mt-0.5 truncate text-xs font-medium text-emerald-200">
                       {myMember
-                        ? statusLabels[myMember.status]
+                        ? t(statusPresentation?.labelKey ?? "status.active")
                         : t("office.notJoined")}
                     </dd>
                   </div>
@@ -204,6 +205,9 @@ export function OfficeSidebar({
                     </dd>
                   </div>
                 </dl>
+                <p className="mt-2 text-[10px] leading-4 text-slate-500">
+                  {t("office.autoAwayHint")}
+                </p>
               </div>
 
               <div className="border border-slate-800 bg-[#0b1d2c] p-3">
@@ -222,7 +226,9 @@ export function OfficeSidebar({
               <OfficeStatusPanel
                 compact
                 currentUserId={currentUserId}
+                currentUserName={currentUserName}
                 member={myMember}
+                onManualStatusChange={onManualStatusChange}
               />
             ) : (
               <p className="border border-dashed border-slate-700 bg-slate-950/40 px-3 py-8 text-center text-sm text-slate-400">

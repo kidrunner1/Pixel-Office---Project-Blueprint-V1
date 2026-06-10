@@ -134,6 +134,8 @@ export const englishTranslations = {
   "office.notJoined": "Not joined",
   "office.todaysFocus": "Today's focus",
   "office.noTask": "No task set yet.",
+  "office.noFocusSet": "No focus set",
+  "office.autoAwayHint": "Auto-away after 5 minutes idle",
   "office.joinToUpdate": "Join the office to update your task and status.",
   "office.full": "Office is full",
   "office.moving": "Moving through the office",
@@ -176,10 +178,12 @@ export const englishTranslations = {
   "role.member": "Member",
   "role.admin": "Admin",
 
+  "status.active": "Active",
   "status.online": "Online",
   "status.focus": "Focus",
   "status.meeting": "Meeting",
   "status.break": "Break",
+  "status.away": "Away",
 
   "chat.open": "Open chat",
   "chat.expand": "Expand office chat",
@@ -374,6 +378,8 @@ export const thaiTranslations = {
   "office.notJoined": "ยังไม่ได้เข้าร่วม",
   "office.todaysFocus": "โฟกัสวันนี้",
   "office.noTask": "ยังไม่ได้ตั้งงาน",
+  "office.noFocusSet": "ยังไม่ได้ตั้งโฟกัส",
+  "office.autoAwayHint": "เปลี่ยนเป็นไม่อยู่เมื่อไม่มีการใช้งาน 5 นาที",
   "office.joinToUpdate": "เข้าออฟฟิศก่อนอัปเดตงานและสถานะ",
   "office.full": "ออฟฟิศเต็มแล้ว",
   "office.moving": "กำลังเดินในออฟฟิศ",
@@ -416,10 +422,12 @@ export const thaiTranslations = {
   "role.member": "สมาชิก",
   "role.admin": "ผู้ดูแล",
 
+  "status.active": "พร้อมใช้งาน",
   "status.online": "ออนไลน์",
   "status.focus": "โฟกัส",
   "status.meeting": "ประชุม",
   "status.break": "พัก",
+  "status.away": "ไม่อยู่",
 
   "chat.open": "เปิดแชต",
   "chat.expand": "ขยายแชตออฟฟิศ",

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { useTranslation } from "@/features/i18n/use-translation";
+import { buildSocketPresencePayload } from "@/features/office/utils/sync-socket-presence";
 import {
   disconnectSocketClient,
   getSocketClient,
@@ -31,22 +32,6 @@ type UseOfficeSocketResult = {
   roomState: SocketRoomState | null;
 };
 
-function buildJoinRoomPayload(
-  currentUserName: string,
-  myMember: RoomMemberView,
-): JoinRoomPayload {
-  return {
-    roomId: myMember.roomId,
-    userId: myMember.userId,
-    name: currentUserName,
-    positionX: myMember.positionX,
-    positionY: myMember.positionY,
-    avatar: myMember.avatar,
-    status: myMember.status,
-    todayTask: myMember.todayTask,
-  };
-}
-
 export function useOfficeSocket({
   currentUserName,
   isEnabled,
@@ -72,7 +57,7 @@ export function useOfficeSocket({
 
   useEffect(() => {
     latestJoinPayload.current = myMember
-      ? buildJoinRoomPayload(currentUserName, myMember)
+      ? buildSocketPresencePayload(currentUserName, myMember)
       : null;
   }, [currentUserName, myMember]);
 

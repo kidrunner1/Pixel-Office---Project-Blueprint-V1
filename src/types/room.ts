@@ -1,7 +1,12 @@
 import type { AvatarConfig } from "@/types/avatar";
 import type { SafeUser } from "@/types/user";
 
-export type RoomMemberStatus = "online" | "focus" | "meeting" | "break";
+export type RoomMemberStatus =
+  | "online"
+  | "focus"
+  | "meeting"
+  | "break"
+  | "away";
 
 export type RoomMemberView = {
   id: string;

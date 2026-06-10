@@ -6,6 +6,7 @@ import { ChatPanel } from "@/features/chat/components/chat-panel";
 import { OfficeMainStage } from "@/features/office/components/office-main-stage";
 import { OfficeSidebar } from "@/features/office/components/office-sidebar";
 import { OfficeTopbar } from "@/features/office/components/office-topbar";
+import { useIdleStatus } from "@/features/office/hooks/use-idle-status";
 import { useKeyboardMovement } from "@/features/office/hooks/use-keyboard-movement";
 import { useOfficeSocket } from "@/features/office/hooks/use-office-socket";
 import { useRoomStore } from "@/stores/room-store";
@@ -38,6 +39,12 @@ export function OfficeShell({
   const activeMembers =
     room?.roomMembers.filter((member) => member.isOnline) ?? [];
   const hasJoined = Boolean(myMember);
+  const { recordManualStatus } = useIdleStatus({
+    currentUserId,
+    currentUserName,
+    isEnabled: hasJoined,
+    member: myMember,
+  });
   const { blockedMessage, facingDirection, isMoving } = useKeyboardMovement({
     currentUserId,
     isUpdatePending: isLoading,
@@ -74,6 +81,7 @@ export function OfficeShell({
           members={activeMembers}
           myMember={myMember}
           onClose={() => setIsSidebarOpen(false)}
+          onManualStatusChange={recordManualStatus}
         />
 
         <OfficeMainStage
